@@ -239,14 +239,16 @@ namespace TelephoneDirectory
 
             int index = 0;
 
-            foreach(var item in direct)
+            var db = telephoneDirectoryEntities.Directory;
+
+            foreach (var item in direct)
             {
                 //тут что-то непонятное
                 int code = 0;
                 int i = 0;
                 foreach (var it in infoWithCode)
                 {
-                    if(i == index)
+                    if (i == index)
                     {
                         code = it.Key;
                         index++;
@@ -255,7 +257,7 @@ namespace TelephoneDirectory
                     i++;
                 }
 
-                var directory = telephoneDirectoryEntities.Directory
+                var directory = db
                     .Where(o => o.Code == code)
                     .FirstOrDefault();
 
