@@ -1,0 +1,111 @@
+﻿<Window x:Class="TelephoneDirectory.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Телефонный справочник" 
+        WindowStartupLocation="CenterScreen"
+        MinHeight="700" 
+        MinWidth="1050"
+        >
+    <Window.Background>
+        <RadialGradientBrush>
+            <GradientStop Color="#FFE4C285"/>
+            <GradientStop Color="#FFE4D8C3" Offset="1"/>
+            <GradientStop Color="#FFECE3C7" Offset="0.827"/>
+        </RadialGradientBrush>
+    </Window.Background>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.15*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Label Content="Телефонный справочник" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="50"
+               FontFamily="Arial" FontWeight="ExtraBold"/>
+
+        <Grid Grid.Row="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="0.3*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+                <Button Content="Сортировать по сфере деятельности" MaxHeight="50" HorizontalAlignment="Left" VerticalAlignment="Top"
+                        FontFamily="Arial" FontSize="20" FontStretch="Medium" BorderBrush="#FFDCD749" BorderThickness="3" x:Name="SortButton"
+                        Click="SortButton_Click">
+                    <Button.Background>
+                        <SolidColorBrush Color="#FFC6F5EC" Opacity="0.7"/>
+                    </Button.Background>
+                </Button>
+
+                <ListBox Margin="0,10,0,0" Background="#FFF9F0D7" BorderThickness="4" BorderBrush="#FFF9A06C" FontFamily="Arial" FontSize="25" 
+                     FontStretch="Medium" x:Name="telephoneDirectoryListBox" ScrollViewer.HorizontalScrollBarVisibility="Visible" MinHeight="520"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1">
+                <Border BorderBrush="Gray" BorderThickness="2" Margin="5">
+                    <StackPanel>
+                        <TextBox Text="Название" FontSize="20" FontStretch="Medium" TextAlignment="Center" Margin="5" FontFamily="Arial"
+                          BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="nameTextBox" Cursor="IBeam">
+                            <TextBox.Background>
+                                <SolidColorBrush Color="White" Opacity="0.5"/>
+                            </TextBox.Background>
+                        </TextBox>
+
+                        <TextBox Text="Номер телефона" FontSize="20" FontStretch="Medium" TextAlignment="Center" Margin="5,15,5,5" FontFamily="Arial"
+                          BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="phoneTextBox" Cursor="IBeam">
+                            <TextBox.Background>
+                                <SolidColorBrush Color="White" Opacity="0.5"/>
+                            </TextBox.Background>
+                        </TextBox>
+
+                        <TextBox Text="Адрес" FontSize="20" FontStretch="Medium" TextAlignment="Center" Margin="5,15,5,5" FontFamily="Arial"
+                          BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="addressTextBox" Cursor="IBeam">
+                            <TextBox.Background>
+                                <SolidColorBrush Color="White" Opacity="0.5"/>
+                            </TextBox.Background>
+                        </TextBox>
+
+                        <TextBox Text="Время работы" FontSize="20" FontStretch="Medium" TextAlignment="Center" Margin="5,15,5,5" FontFamily="Arial"
+                          BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="timeTextBox" Cursor="IBeam">
+                            <TextBox.Background>
+                                <SolidColorBrush Color="White" Opacity="0.5"/>
+                            </TextBox.Background>
+                        </TextBox>
+
+                        <TextBox Text="Сфера деятельности" FontSize="20" FontStretch="Medium" TextAlignment="Center" Margin="5,15,5,5" FontFamily="Arial"
+                          BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="sphereActivityTextBox" Cursor="IBeam">
+                            <TextBox.Background>
+                                <SolidColorBrush Color="White" Opacity="0.5"/>
+                            </TextBox.Background>
+                        </TextBox>
+                    </StackPanel>
+                </Border>
+
+                <Button Content="Добавить" FontSize="25" FontStretch="Medium" HorizontalContentAlignment="Center" Margin="5,50,5,5" FontFamily="Arial"
+                        BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="AddButton" Cursor="Hand" Click="AddButton_Click">
+                    <Button.Background>
+                        <SolidColorBrush Color="#FFC9F3A0" Opacity="0.5"/>
+                    </Button.Background>
+                </Button>
+
+                <Button Content="Изменить" FontSize="25" FontStretch="Medium" HorizontalContentAlignment="Center" Margin="5,15,5,5" FontFamily="Arial"
+                        BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="EditButton" Cursor="Hand" Click="EditButton_Click">
+                    <Button.Background>
+                        <SolidColorBrush Color="#FFF3D7A4" Opacity="0.5"/>
+                    </Button.Background>
+                </Button>
+
+                <Button Content="Удалить" FontSize="25" FontStretch="Medium" HorizontalContentAlignment="Center" Margin="5,15,5,5" FontFamily="Arial"
+                        BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="DeleteButton" Cursor="Hand" Click="DeleteButton_Click">
+                    <Button.Background>
+                        <SolidColorBrush Color="#FFF98B8B" Opacity="0.5"/>
+                    </Button.Background>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>
