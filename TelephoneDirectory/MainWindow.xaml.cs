@@ -16,60 +16,20 @@ namespace TelephoneDirectory
     public partial class MainWindow : Window
     {
         //List
-        List<string> info = new List<string>();
-        //Dictionary
-        Dictionary<int, int> infoWithCode = new Dictionary<int, int>();
+        static readonly List<string> info = new List<string>();
 
-        TelephoneDirectoryEntities4 telephoneDirectoryEntities = new TelephoneDirectoryEntities4();
+        readonly TelephoneDirectoryEntities4 telephoneDirectoryEntities = new TelephoneDirectoryEntities4();
 
         public MainWindow()
         {
             InitializeComponent();
 
-            Directory directory = telephoneDirectoryEntities.Directory.FirstOrDefault();
+            info.Clear();
 
             //заполнение списка
-            foreach(var item in telephoneDirectoryEntities.Directory)
+            foreach (Directory item in telephoneDirectoryEntities.Directory.ToList())
             {
-                directory = item;
-
-                if (directory == null)
-                {
-                    break;
-                }
-
-                //программно создаем строку
-                //это текст
-                Label label = new Label
-                {
-                    Content = directory.NameOrg + " | " + directory.Phone + " | " + directory.AddressOrg + " | " +
-                        directory.TimeWork + " | " + directory.sphereActivity
-                };
-
-                //это кнопка скопировать
-                Button button = new Button
-                {
-                    Background = new ImageBrush(new BitmapImage(new Uri(@"C:\Users\vovab\Candy shop\Images\copy.png"))),
-                    Margin = new Thickness(5, 0, 0, 0),
-                    Cursor = Cursors.Hand,
-                    MinWidth = 50,
-                    BorderBrush = Brushes.Gray,
-                    BorderThickness = new Thickness(2)
-                };
-                button.Click += new RoutedEventHandler(CopyButton_Click);
-
-                //соединяем
-                StackPanel stackPanel = new StackPanel
-                {
-                    Orientation = Orientation.Horizontal
-                };
-                stackPanel.Children.Add(label);
-                stackPanel.Children.Add(button);
-
-                telephoneDirectoryListBox.Items.Add(stackPanel);
-
-                info.Add((string)label.Content);
-                infoWithCode.Add(directory.Code, info.Count - 1);
+                MakeElements(item);
             }
         }
 
@@ -120,8 +80,6 @@ namespace TelephoneDirectory
         {
             if (telephoneDirectoryListBox.SelectedIndex != -1)
             {
-                int index = telephoneDirectoryListBox.SelectedIndex;
-
                 if (StringNotEmpty(nameTextBox.Text) && StringNotEmpty(phoneTextBox.Text) && StringNotEmpty(addressTextBox.Text)
                 && StringNotEmpty(timeTextBox.Text) && StringNotEmpty(sphereActivityTextBox.Text))
                 {
@@ -136,16 +94,8 @@ namespace TelephoneDirectory
 
                     if (isPhone)
                     {
-                        //изменение в БД
-                        //тут я узнаю код
-                        int code = 0;
-                        foreach (var item in infoWithCode)
-                        {
-                            if (item.Value == index)
-                            {
-                                code = item.Key;
-                            }
-                        }
+                        int code = Convert.ToInt32(telephoneDirectoryListBox.Items[telephoneDirectoryListBox.SelectedIndex - 1]
+                            .ToString().Split(' ')[1].Trim());
 
                         //тут изменяю
                         var directory = telephoneDirectoryEntities.Directory
@@ -184,17 +134,8 @@ namespace TelephoneDirectory
         {
             if (telephoneDirectoryListBox.SelectedIndex != -1)
             {
-                int index = telephoneDirectoryListBox.SelectedIndex;
-
-                //тут я узнаю код
-                int code = 0;
-                foreach (var item in infoWithCode)
-                {
-                    if (item.Value == index)
-                    {
-                        code = item.Key;
-                    }
-                }
+                int code = Convert.ToInt32(telephoneDirectoryListBox.Items[telephoneDirectoryListBox.SelectedIndex - 1]
+                            .ToString().Split(' ')[1].Trim());
 
                 //тут удаляю
                 Directory directory = telephoneDirectoryEntities.Directory
@@ -229,50 +170,73 @@ namespace TelephoneDirectory
         {
             if (telephoneDirectoryListBox.SelectedIndex != -1)
             {
-                Clipboard.SetText(info[telephoneDirectoryListBox.SelectedIndex].Split('|')[1].Trim());
+                Clipboard.SetText(info[(telephoneDirectoryListBox.SelectedIndex - 1) / 2].ToString().Split('|')[1].Trim());
             }
         }
 
         private void SortButton_Click(object sender, RoutedEventArgs e)
         {
-            var direct = telephoneDirectoryEntities.Directory.OrderBy(p => p.sphereActivity);
+            //очищаем листбокс
+            telephoneDirectoryListBox.Items.Clear();
 
-            int index = 0;
+            //получаем отсортированную таблицу
+            List<Directory> sortDirect = telephoneDirectoryEntities.Directory.OrderBy(p => p.sphereActivity).ToList();
 
-            var db = telephoneDirectoryEntities.Directory;
-
-            foreach (var item in direct)
+            info.Clear();
+            
+            //заполнение списка
+            foreach (Directory item in sortDirect)
             {
-                //тут что-то непонятное
-                int code = 0;
-                int i = 0;
-                foreach (var it in infoWithCode)
-                {
-                    if (i == index)
-                    {
-                        code = it.Key;
-                        index++;
-                        break;
-                    }
-                    i++;
-                }
-
-                var directory = db
-                    .Where(o => o.Code == code)
-                    .FirstOrDefault();
-
-                directory.NameOrg = item.NameOrg;
-                directory.Phone = item.Phone;
-                directory.AddressOrg = item.AddressOrg;
-                directory.TimeWork = item.TimeWork;
-                directory.sphereActivity = item.sphereActivity;
+                MakeElements(item);
             }
+        }
 
-            telephoneDirectoryEntities.SaveChanges();
+        private void MakeElements(Directory _tableDir)
+        {
+            //программно создаем строку
+            //это кнопка скопировать
+            Button copy = new Button
+            {
+                Background = new ImageBrush(new BitmapImage(new Uri(@"C:\Users\vovab\Candy shop\Images\copy.png"))),
+                Margin = new Thickness(5, 0, 0, 0),
+                Cursor = Cursors.Hand,
+                MinWidth = 50,
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(2),
+                ToolTip = new ToolTip { Content = "Нажмите, чтобы скопировать номер телефона" } //подсказка
+            };
+            copy.Click += new RoutedEventHandler(CopyButton_Click);
 
-            MainWindow mainWindow = new MainWindow();
-            mainWindow.Show();
-            Close();
+            //соединяем
+            StackPanel line = new StackPanel
+            {
+                Orientation = Orientation.Horizontal
+            };
+
+            //это скрытый код
+            Label codeLbl = new Label
+            {
+                Content = _tableDir.Code,
+                Visibility = Visibility.Collapsed
+            };
+
+            //это текст
+            line.Children.Add(new Label
+            {
+                Content = _tableDir.NameOrg + " | " + _tableDir.Phone + " | " + _tableDir.AddressOrg + " | " +
+                    _tableDir.TimeWork + " | " + _tableDir.sphereActivity
+            });
+            line.Children.Add(copy);
+
+            telephoneDirectoryListBox.Items.Add(new ListBoxItem
+            {
+                IsHitTestVisible = false,
+                Content = codeLbl
+            }); //на экран 'это скрытый код'
+            telephoneDirectoryListBox.Items.Add(line); //на экран 'это текст весь'
+
+            info.Add(_tableDir.NameOrg + " | " + _tableDir.Phone + " | " + _tableDir.AddressOrg + " | " +
+                    _tableDir.TimeWork + " | " + _tableDir.sphereActivity);
         }
     }
 }

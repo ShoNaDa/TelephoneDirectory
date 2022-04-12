@@ -33,13 +33,15 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel>
-                <Button Content="Сортировать по сфере деятельности" MaxHeight="50" HorizontalAlignment="Left" VerticalAlignment="Top"
-                        FontFamily="Arial" FontSize="20" FontStretch="Medium" BorderBrush="#FFDCD749" BorderThickness="3" x:Name="SortButton"
-                        Click="SortButton_Click">
-                    <Button.Background>
-                        <SolidColorBrush Color="#FFC6F5EC" Opacity="0.7"/>
-                    </Button.Background>
-                </Button>
+                <Border CornerRadius="25" BorderBrush="#FFF9A06C" BorderThickness="3,3,3,0" HorizontalAlignment="Right" Margin="0,0,30,-10">
+                    <Button Content="Сортировать по сфере деятельности" MaxHeight="50"  VerticalAlignment="Top"
+                        FontFamily="Arial" FontSize="20" FontStretch="Medium" BorderThickness="2" x:Name="SortButton"
+                        Click="SortButton_Click" Margin="10,10,10,10" Foreground="#FFD6F7FF">
+                        <Button.Background>
+                            <SolidColorBrush Color="#FF808887" Opacity="0.7"/>
+                        </Button.Background>
+                    </Button>
+                </Border>
 
                 <ListBox Margin="0,10,0,0" Background="#FFF9F0D7" BorderThickness="4" BorderBrush="#FFF9A06C" FontFamily="Arial" FontSize="25" 
                      FontStretch="Medium" x:Name="telephoneDirectoryListBox" ScrollViewer.HorizontalScrollBarVisibility="Visible" MinHeight="520"/>
@@ -84,6 +86,9 @@
                         </TextBox>
                     </StackPanel>
                 </Border>
+
+                <Label Content="↑ Заполните для добавления / изменения" FontSize="11" FontStretch="Medium" HorizontalContentAlignment="Center"
+                       Margin="5,20,5,5" BorderThickness="2" BorderBrush="#FFF9A06C" FontFamily="Arial"/>
 
                 <Button Content="Добавить" FontSize="25" FontStretch="Medium" HorizontalContentAlignment="Center" Margin="5,50,5,5" FontFamily="Arial"
                         BorderThickness="2" BorderBrush="#FFF9A06C" x:Name="AddButton" Cursor="Hand" Click="AddButton_Click">
