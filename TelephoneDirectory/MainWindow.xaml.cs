@@ -35,44 +35,11 @@ namespace TelephoneDirectory
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            if (StringNotEmpty(nameTextBox.Text) && StringNotEmpty(phoneTextBox.Text) && StringNotEmpty(addressTextBox.Text)
-                && StringNotEmpty(timeTextBox.Text) && StringNotEmpty(sphereActivityTextBox.Text))
+            if (AddToDB(nameTextBox.Text, phoneTextBox.Text, addressTextBox.Text, timeTextBox.Text, sphereActivityTextBox.Text))
             {
-                bool isPhone = true;
-                foreach (char item in phoneTextBox.Text)
-                {
-                    if (!CheckingForNumbers(item.ToString()))
-                    {
-                        isPhone = false;
-                    }
-                }
-
-                if (isPhone)
-                {
-                    //добавляем в БД
-                    telephoneDirectoryEntities.Directory.Add(new Directory
-                    {
-                        NameOrg = nameTextBox.Text,
-                        Phone = phoneTextBox.Text,
-                        AddressOrg = addressTextBox.Text,
-                        TimeWork = timeTextBox.Text,
-                        sphereActivity = sphereActivityTextBox.Text
-                    });
-
-                    telephoneDirectoryEntities.SaveChanges();
-
-                    MainWindow mainWindow = new MainWindow();
-                    mainWindow.Show();
-                    Close();
-                }
-                else
-                {
-                    MessageBox.Show("Телефон должен содержать только цифры");
-                }
-            }
-            else
-            {
-                MessageBox.Show("Все поля должны быть заполнены");
+                MainWindow mainWindow = new MainWindow();
+                mainWindow.Show();
+                Close();
             }
         }
 
@@ -80,48 +47,15 @@ namespace TelephoneDirectory
         {
             if (telephoneDirectoryListBox.SelectedIndex != -1)
             {
-                if (StringNotEmpty(nameTextBox.Text) && StringNotEmpty(phoneTextBox.Text) && StringNotEmpty(addressTextBox.Text)
-                && StringNotEmpty(timeTextBox.Text) && StringNotEmpty(sphereActivityTextBox.Text))
+                int code = Convert.ToInt32(telephoneDirectoryListBox.Items[telephoneDirectoryListBox.SelectedIndex - 1]
+                        .ToString().Split(' ')[1].Trim());
+
+                if (EditToDB(nameTextBox.Text, phoneTextBox.Text, addressTextBox.Text,
+                    timeTextBox.Text, sphereActivityTextBox.Text, code))
                 {
-                    bool isPhone = true;
-                    foreach (char item in phoneTextBox.Text)
-                    {
-                        if (!CheckingForNumbers(item.ToString()))
-                        {
-                            isPhone = false;
-                        }
-                    }
-
-                    if (isPhone)
-                    {
-                        int code = Convert.ToInt32(telephoneDirectoryListBox.Items[telephoneDirectoryListBox.SelectedIndex - 1]
-                            .ToString().Split(' ')[1].Trim());
-
-                        //тут изменяю
-                        var directory = telephoneDirectoryEntities.Directory
-                            .Where(c => c.Code == code)
-                            .FirstOrDefault();
-
-                        directory.NameOrg = nameTextBox.Text;
-                        directory.Phone = phoneTextBox.Text;
-                        directory.AddressOrg = addressTextBox.Text;
-                        directory.TimeWork = timeTextBox.Text;
-                        directory.sphereActivity = sphereActivityTextBox.Text;
-
-                        telephoneDirectoryEntities.SaveChanges();
-
-                        MainWindow mainWindow = new MainWindow();
-                        mainWindow.Show();
-                        Close();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Телефон должен содержать только цифры");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Все поля должны быть заполнены");
+                    MainWindow mainWindow = new MainWindow();
+                    mainWindow.Show();
+                    Close();
                 }
             }
             else
@@ -137,16 +71,12 @@ namespace TelephoneDirectory
                 int code = Convert.ToInt32(telephoneDirectoryListBox.Items[telephoneDirectoryListBox.SelectedIndex - 1]
                             .ToString().Split(' ')[1].Trim());
 
-                //тут удаляю
-                Directory directory = telephoneDirectoryEntities.Directory
-                    .Where(o => o.Code == code)
-                    .FirstOrDefault();
-                telephoneDirectoryEntities.Directory.Remove(directory);
-                telephoneDirectoryEntities.SaveChanges();
-
-                MainWindow mainWindow = new MainWindow();
-                mainWindow.Show();
-                Close();
+                if (DeleteToDB(code))
+                {
+                    MainWindow mainWindow = new MainWindow();
+                    mainWindow.Show();
+                    Close();
+                }
             }
             else
             {
@@ -155,13 +85,13 @@ namespace TelephoneDirectory
         }
 
         //функция проверки на заполнение
-        static internal bool StringNotEmpty(string _str)
+        public bool StringNotEmpty(string _str)
         {
             return _str != string.Empty && _str != "" && _str.Trim() != "";
         }
 
         //функция проверки на цифры
-        private bool CheckingForNumbers(string _str)
+        public bool CheckingForNumbers(string _str)
         {
             return Regex.IsMatch(_str, @"[0-9]");
         }
@@ -179,11 +109,10 @@ namespace TelephoneDirectory
             //очищаем листбокс
             telephoneDirectoryListBox.Items.Clear();
 
-            //получаем отсортированную таблицу
-            List<Directory> sortDirect = telephoneDirectoryEntities.Directory.OrderBy(p => p.sphereActivity).ToList();
+            List<Directory> sortDirect = SortList();
 
             info.Clear();
-            
+
             //заполнение списка
             foreach (Directory item in sortDirect)
             {
@@ -237,6 +166,117 @@ namespace TelephoneDirectory
 
             info.Add(_tableDir.NameOrg + " | " + _tableDir.Phone + " | " + _tableDir.AddressOrg + " | " +
                     _tableDir.TimeWork + " | " + _tableDir.sphereActivity);
+        }
+
+        public bool AddToDB(string _name, string _phone, string _address, string _time, string _sphere)
+        {
+            if (StringNotEmpty(_name) && StringNotEmpty(_phone) && StringNotEmpty(_address) && StringNotEmpty(_time)
+                && StringNotEmpty(_phone) && StringNotEmpty(_sphere))
+            {
+                bool isPhone = true;
+                foreach (char item in _phone)
+                {
+                    if (!CheckingForNumbers(item.ToString()))
+                    {
+                        isPhone = false;
+                    }
+                }
+
+                if (isPhone)
+                {
+                    //добавляем в БД
+                    telephoneDirectoryEntities.Directory.Add(new Directory
+                    {
+                        NameOrg = _name,
+                        Phone = _phone,
+                        AddressOrg = _address,
+                        TimeWork = _time,
+                        sphereActivity = _sphere
+                    });
+
+                    telephoneDirectoryEntities.SaveChanges();
+
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Телефон должен содержать только цифры");
+
+                    return false;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Все поля должны быть заполнены");
+
+                return false;
+            }
+        }
+        public bool EditToDB(string _name, string _phone, string _address, string _time, string _sphere, int _code)
+        {
+            if (StringNotEmpty(_name) && StringNotEmpty(_phone) && StringNotEmpty(_address) && StringNotEmpty(_time)
+                && StringNotEmpty(_phone) && StringNotEmpty(_sphere))
+            {
+                bool isPhone = true;
+                foreach (char item in _phone)
+                {
+                    if (!CheckingForNumbers(item.ToString()))
+                    {
+                        isPhone = false;
+                    }
+                }
+
+                if (isPhone)
+                {
+                    //тут изменяю
+                    var directory = telephoneDirectoryEntities.Directory
+                        .Where(c => c.Code == _code)
+                        .FirstOrDefault();
+
+                    directory.NameOrg = _name;
+                    directory.Phone = _phone;
+                    directory.AddressOrg = _address;
+                    directory.TimeWork = _time;
+                    directory.sphereActivity = _sphere;
+
+                    telephoneDirectoryEntities.SaveChanges();
+
+                    return true;
+                }
+                else
+                {
+                    MessageBox.Show("Телефон должен содержать только цифры");
+
+                    return false;
+                }
+            }
+            else
+            {
+                MessageBox.Show("Все поля должны быть заполнены");
+
+                return false;
+            }
+        }
+
+        public bool DeleteToDB(int _code)
+        {
+            //тут удаляю
+            Directory directory = telephoneDirectoryEntities.Directory
+                .Where(o => o.Code == _code)
+                .FirstOrDefault();
+
+            telephoneDirectoryEntities.Directory.Remove(directory);
+            telephoneDirectoryEntities.SaveChanges();
+
+            return true;
+        }
+
+        public List<Directory> SortList()
+        {
+            //получаем отсортированную таблицу
+            List<Directory> sortDirect = telephoneDirectoryEntities.Directory.OrderBy(p => p.sphereActivity).ToList();
+            
+            return sortDirect;
         }
     }
 }
